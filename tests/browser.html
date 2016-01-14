@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>react-intl-ns browser setup test</title>
+    </head>
+    <body>
+        <div id="react-root"></div>
+        <script src="../node_modules/react/dist/react.js"></script>
+        <script src="../node_modules/react-dom/dist/react-dom.js"></script>
+        <script src="../node_modules/react-intl/dist/react-intl.js"></script>
+        <script src="../node_modules/react-intl/dist/locale-data/en.js"></script>
+        <script src="../node_modules/react-intl/dist/locale-data/es.js"></script>
+        <script src="../dist/main.es5.js"></script>
+        <script>
+            var locale = window.location.href.split('?')[1] || 'en';
+            var messages = {en: {hello: "Hello, World!"},
+                            es: {hello: "¡Hola, Mundo!"}};
+            var t = ReactIntlNs.intlShortcuts('ns').t;
+            ReactIntl.addLocaleData(ReactIntlLocaleData.en);
+            ReactIntl.addLocaleData(ReactIntlLocaleData.es);
+            ReactDOM.render(
+                React.createElement(ReactIntlNs.IntlNsProvider,
+                                    {locale: locale},
+                    React.createElement(ReactIntlNs.IntlNamespace,
+                                        {namespace: 'ns', messages: messages},
+                        t('hello'))),
+                document.getElementById('react-root')
+            );
+        </script>
+    </body>
+</html>
+
