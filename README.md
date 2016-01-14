@@ -35,7 +35,7 @@ import {IntlNamespace, intlShortcuts} from 'react-intl-ns';
 const {t} = intlShortcuts('comp');
 const messages = {en: {title: "comp title"}};
 
-class Comp extends Component {
+export default class Comp extends Component {
     render() {
         return  <IntlNamespace namespace='comp' messages={messages}>
                     {t`title`}
