@@ -1,6 +1,10 @@
 module.exports = {
     'root': true,
     'parser': 'babel-eslint',
+    'env': {
+        'es6': true,
+        'node': true
+    },
     'ecmaFeatures': {
         'experimentalObjectRestSpread': true,
         'jsx': true,
@@ -11,7 +15,8 @@ module.exports = {
     ],
     'extends': 'eslint:recommended',  // In case some new options are added.
     'rules': {
-        // ESLint possible errors set (most in recommended).
+        // ESLint's docs "Possible errors" section (most in recommended).
+        'no-console': 1,
         'no-extra-parens': 1,
         'no-unexpected-multiline': 2,
         'valid-jsdoc': 0,
@@ -57,7 +62,7 @@ module.exports = {
         'no-octal-escape': 2,
         'no-octal': 2,
         'no-param-reassign': 0,
-        'no-process-env': 2,
+        'no-process-env': 1,
         'no-proto': 2,
         'no-redeclare': 2,
         'no-return-assign': 2,
@@ -94,7 +99,7 @@ module.exports = {
 
         // Node section.
         'callback-return': 1,
-        'global-require': 2,
+        'global-require': 1,
         'handle-callback-err': 1,
         'no-mixed-requires': 2,
         'no-new-require': 2,
