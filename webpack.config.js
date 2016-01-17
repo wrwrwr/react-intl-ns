@@ -34,7 +34,7 @@ if (config.webpackLibrary) {
     output.libraryTarget = 'umd';
 }
 
-// Modules not to be bundled (to be loaded by user; e.g. {'react': 'React'}).
+// Modules not to be bundled (to be loaded by the user).
 var externals = config.webpackExternals || {};
 
 // What modules should Babel process?
