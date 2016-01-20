@@ -195,7 +195,7 @@ module.exports = {
         'require-yield': 2,
 
         // React plugin.
-        'react/display-name': 0,
+        'react/display-name': 1,
         'react/forbid-prop-types': 0,
         'react/jsx-boolean-value': 1,
         'react/jsx-closing-bracket-location': 0,

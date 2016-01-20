@@ -1,6 +1,6 @@
 {
     "name": "react-intl-ns",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Intl namespaces and shortcuts for reusable components.",
     "author": "Wojtek Ruszczewski <react-intl-ns@wr.waw.pl>",
     "keywords": ["react", "react-intl"],

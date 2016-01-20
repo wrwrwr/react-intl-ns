@@ -35,6 +35,8 @@ const shortcutFactories = {
  * and formats (from intl.namespaces) are used for formatting.
  */
 export class IntlNsProvider extends IntlProvider {
+    static displayName = 'IntlNsProvider';
+
     getChildContext() {
         let context = super.getChildContext();
         let intl = context.intl;
@@ -81,6 +83,8 @@ export class IntlNsProvider extends IntlProvider {
  * Inserts namespace messages and formats into context.intl.
  */
 export class IntlNamespace extends Component {
+    static displayName = 'IntlNamespace';
+
     static propTypes = {
         namespace: PropTypes.string.isRequired,
         messages: PropTypes.object,

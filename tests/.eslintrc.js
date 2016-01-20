@@ -13,7 +13,7 @@ module.exports = {
     },
     'rules': {
         // Mocha's it(..., f) with `this` bound in f.
-        'func-names': 1,
+        'func-names': 0,
         // Console output sometimes needs to be tested.
         'no-console': 0,
         // Magic numbers are fine in tests.
@@ -22,6 +22,8 @@ module.exports = {
         'no-invalid-this': 1,
         // Double quotes for human-readable strings.
         'quotes': [0, 'single'],
+        // Usually there is just a single component created in a case.
+        'react/display-name': 0,
         // Personal preference of indenting JSX used as a function argument
         // by 8 spaces, similarly to continuation lines).
         'react/jsx-indent': 0
