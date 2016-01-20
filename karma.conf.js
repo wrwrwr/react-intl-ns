@@ -1,22 +1,24 @@
-var path = require('path');
-var process = require('process');
+'use strict';
+
+const path = require('path');
+const process = require('process');
 
 // This configuration may be symlinked from a project, thus __dirname may
 // point to its physical location.
-var projectDir = process.cwd();
+let projectDir = process.cwd();
 
 // Reuse the webpack configuration for tests, but bundle everything.
-var webpack = require(path.join(projectDir, 'webpack.config.js'));
+let webpack = require(path.join(projectDir, 'webpack.config.js'));
 if (!Array.isArray(webpack)) {
     webpack = [webpack];
 }
-for (var config of webpack) {
+for (let config of webpack) {
     config.entry = {};
     config.externals = {};
 }
 
 
-module.exports = function(config) {
+module.exports = config => {
     config.set({
         files: [
             'tests/*.jsx'

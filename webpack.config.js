@@ -1,17 +1,20 @@
-var child = require('child_process');
-var path = require('path');
-var process = require('process');
-var string = require('string-replace-webpack-plugin');
-var webpack = require('webpack');
+'use strict';
+
+const child = require('child_process');
+const path = require('path');
+const process = require('process');
+const string = require('string-replace-webpack-plugin');
+const webpack = require('webpack');
 
 // This configuration may be symlinked from a project, thus __dirname may
 // point to its physical location.
-var projectDir = process.cwd();
+let projectDir = process.cwd();
 
 // Global location of node modules (OS-specific).
-var globalModules = String(child.execSync('npm root -g')).trim();
+let globalModules = String(child.execSync('npm root -g')).trim();
 
 // Some often-module-specific configuration can be done through package.json.
+let config;
 try {
     config = require(path.join(projectDir, 'package.json'));
 } catch (e) {
@@ -19,10 +22,10 @@ try {
 }
 
 // What editions of the standard are we building for?
-var esEditions = config.webpackEsEditions || [5];
+let esEditions = config.webpackEsEditions || [5];
 
 // What file are we generating (relative path)?
-var outputs = esEditions.map(edition => {
+let outputs = esEditions.map(edition => {
     var target = config['main:es' + edition];
     var output = {
         filename: path.basename(target),
@@ -37,14 +40,14 @@ var outputs = esEditions.map(edition => {
 });
 
 // Modules not to be bundled (to be loaded by the user).
-var externals = config.webpackExternals || {};
+let externals = config.webpackExternals || {};
 
 // What modules should Babel process?
-var babelDirs = config.webpackBabelDirs || [];
+let babelDirs = config.webpackBabelDirs || [];
 babelDirs.push(projectDir);
 
 // What should Babel transpile to? (Just ES5 is supported at the moment :-)
-var babelPresets = esEditions.map(edition => {
+let babelPresets = esEditions.map(edition => {
     switch (edition) {
         // WA: https://github.com/webpack/webpack/issues/1883.
         case 5: return ['es2015' /*-webpack2*/, 'stage-0', 'react'];
@@ -54,7 +57,7 @@ var babelPresets = esEditions.map(edition => {
 });
 
 // A loader collapsing continuation lines.
-var contLines = string.replace({replacements: [
+let contLines = string.replace({replacements: [
     {pattern: /,\n/g, replacement: () => ', '}
 ]});
 
