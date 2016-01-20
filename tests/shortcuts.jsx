@@ -2,7 +2,7 @@ import {isValidElement} from 'react';
 import {FormattedHTMLMessage, FormattedMessage,
         FormattedNumber} from 'react-intl';
 
-import {intlShortcuts, registerIntlShortcut} from '../main';
+import {intlShortcuts, intlMessageShortcut, intlNumberShortcut} from '../main';
 
 
 describe("Default shortcuts", () => {
@@ -86,28 +86,52 @@ describe("Default shortcuts", () => {
 });
 
 
-describe("Shortcuts registration", () => {
-    it("a new shortcut can be registered", () => {
-        registerIntlShortcut('l', () => 'legomenon');
-        const {l} = intlShortcuts();
-        l.should.equal('legomenon');
+describe("Shortcut factories", () => {
+    it("a new message-like shortcut can be created", () => {
+        class MessageLike extends FormattedMessage {}
+        let factory = intlMessageShortcut(MessageLike);
+        let shortcut = factory();
+        let element = shortcut`legomenon`;
+        element.type.should.equal(MessageLike);
+        element.props.id.should.equal('legomenon');
     });
 
-    it("shortcut factories get a namespace prefixer", () => {
-        registerIntlShortcut('l', prefix => prefix('legomenon'));
-        const {l} = intlShortcuts('hapax');
-        l.should.equal('hapax::legomenon');
+    it("message-like shortcuts prefix ids with namespace", () => {
+        class MessageLike extends FormattedMessage {}
+        let factory = intlMessageShortcut(MessageLike);
+        let shortcut = factory('hapax');
+        let element = shortcut`legomenon`;
+        element.type.should.equal(MessageLike);
+        element.props.id.should.equal('hapax::legomenon');
     });
 
-    it("an arbitrary function can be registered", () => {
-        registerIntlShortcut('l', () => arg => `${arg} legomenon`);
-        const {l} = intlShortcuts();
-        l('dis').should.equal('dis legomenon');
+    it("message-like shortcuts can be used as a function, with values", () => {
+        class MessageLike extends FormattedMessage {}
+        let factory = intlMessageShortcut(MessageLike);
+        let shortcut = factory('dis');
+        let element = shortcut('legomenon', {v: 'value'});
+        element.type.should.equal(MessageLike);
+        element.props.id.should.equal('dis::legomenon');
+        element.props.values.should.deep.equal({v: 'value'});
     });
 
-    it("default shortcuts may be overridden", () => {
-        registerIntlShortcut('t', () => arg => `${arg} legomenon`);
-        const {t} = intlShortcuts();
-        t('tris').should.equal('tris legomenon');
+    it("a new number-like shortcut can be created", () => {
+        class NumberLike extends FormattedNumber {}
+        let factory = intlNumberShortcut(NumberLike);
+        let shortcut = factory();
+        let element = shortcut(5);
+        element.type.should.equal(NumberLike);
+        expect(element.props.format).to.be.undefined();
+        element.props.value.should.equal(5);
+    });
+
+    it("number-like shortcuts prefix format keys with namespace", () => {
+        class NumberLike extends FormattedNumber {}
+        let factory = intlNumberShortcut(NumberLike);
+        let shortcut = factory('tris');
+        let element = shortcut('legomenon', 5);
+        element.type.should.equal(NumberLike);
+        element.props.format.should.equal('tris::legomenon');
+        element.props.value.should.equal(5);
     });
 });

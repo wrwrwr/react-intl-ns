@@ -1,29 +1,8 @@
-import React from 'react';
+import {createElement} from 'react';
 import {FormattedHTMLMessage, FormattedMessage,
         FormattedNumber} from 'react-intl';
 
 import {separator} from './main';
-
-// Default shortcuts.
-const shortcutFactories = {
-    t: prefix => (...args) => {
-        let {id, values} = maybeEvaluateTemplate(args);
-        return <FormattedMessage id={prefix(id)} defaultMessage={id}
-                                 values={values} />;
-    },
-    h: prefix => (...args) => {
-        let {id, values} = maybeEvaluateTemplate(args);
-        return <FormattedHTMLMessage id={prefix(id)} defaultMessage={id}
-                                     values={values} />;
-    },
-    n: prefix => (format, value) => {
-        if (value === undefined) {
-            return <FormattedNumber value={format} />;
-        } else {
-            return <FormattedNumber format={prefix(format)} value={value} />;
-        }
-    }
-};
 
 
 /**
@@ -33,32 +12,66 @@ const shortcutFactories = {
  * Formatted* elements.
  */
 export function intlShortcuts(namespace) {
-    let prefix;
-    if (namespace) {
-        // Prefix ids and keys with the given namespace.
-        prefix = key => `${namespace}${separator}${key}`;
-    } else {
-        // No namespace, match the signatures of the namespaced constructs.
-        prefix = key => key;
-    }
-    // Generate shortcuts for the namespace.
-    let shortcuts = {};
-    for (let key of Object.keys(shortcutFactories)) {
-        shortcuts[key] = shortcutFactories[key](prefix);
-    }
-    return shortcuts;
+    return {
+        t: intlMessageShortcut(FormattedMessage)(namespace),
+        h: intlMessageShortcut(FormattedHTMLMessage)(namespace),
+        n: intlNumberShortcut(FormattedNumber)(namespace)
+    };
 }
 
 
 /**
- * Registers a shortcut to be available through intlShortcuts().
+ * Creates a shortcut factory for a FormattedMessage-like component.
  *
- * Utility for modules that provide some custom intl components and would like
- * to integrate with intl-ns. The factory should take a namespace prefixer and
- * return a shortcut (likely some function).
+ * The factory takes a namespace and creates a shortcut for a components bound
+ * to it. The shortcut may be used as a template tag or a function.
  */
-export function registerIntlShortcut(key, shortcutFactory) {
-    shortcutFactories[key] = shortcutFactory;
+export function intlMessageShortcut(component) {
+    return namespace => {
+        let prefix = prefixer(namespace);
+        return (...args) => {
+            let {id, values} = maybeEvaluateTemplate(args);
+            return createElement(component, {id: prefix(id),
+                                             defaultMessage: id,
+                                             values});
+        };
+    };
+}
+
+
+/**
+ * Creates a shortcut factory for a FormattedNumber-like component.
+ *
+ * The factory takes a namespace and creates a shortcut for a component bound
+ * to it. The shortcut takes a format (to be namespaced) as the first argument
+ * and value as the second.
+ */
+export function intlNumberShortcut(component) {
+    return namespace => {
+        let prefix = prefixer(namespace);
+        return (format, value) => {
+            if (value === undefined) {
+                return createElement(component, {value: format});
+            } else {
+                return createElement(component, {format: prefix(format),
+                                                 value});
+            }
+        };
+    };
+}
+
+
+/**
+ * Returns a function that prefixes ids with namespace.
+ */
+function prefixer(namespace) {
+    if (namespace) {
+        // Prefix ids and keys with the given namespace.
+        return key => `${namespace}${separator}${key}`;
+    } else {
+        // No namespace, match the signatures of the namespaced constructs.
+        return key => key;
+    }
 }
 
 
@@ -66,7 +79,7 @@ export function registerIntlShortcut(key, shortcutFactory) {
  * Helper to support calling a shortcut as a function or using it as a template
  * tag, for example t('msg') and t`msg` mean the same.
  */
-export function maybeEvaluateTemplate(args) {
+function maybeEvaluateTemplate(args) {
     if (typeof args[0] === 'string') {
         // Direct call (second argument is taken as values).
         return {id: args[0], values: args[1]};

@@ -103,21 +103,28 @@ or directly using the `n` shortcut:
 n('frequency', 0.5)
 ```
 
-Shortcuts registry
+Shortcut factories
 ------------------
 
-Modules that provide custom intl components can integrate with react-intl-ns by
-calling `registerIntlShortcut()`:
+Two helpers are available for modules that would like to provide shortcuts for
+namespaced version of custom components.
+
+If the component extends `FormattedMessage` use `intlMessageShortcut` factory:
 
 ```js
-import {maybeEvaluateTemplate, registerIntlShortcut} from 'react-intl-ns';
+class CustomMessage extends FormattedMessage {}
 
-class Message extends FormattedMessage {}
+import {intlMessageShortcut} from 'react-intl-ns';
+export const cm = intlMessageShortcut(CustomMessage);
+```
 
-registerIntlShortcut('m', prefix => (...args) => {
-    let {id, values} = maybeEvaluateTemplate(args);
-    return <Message id={prefix(id)} defaultMessage={id} values={values} />;
-});
+If it is similar to `FormattedNumber` use `intlNumberShortcut` instead:
+
+```js
+class CustomNumber extends FormattedNumber {}
+
+import {intlNumberShortcut} from 'react-intl-ns';
+export const cn = intlNumberShortcut(CustomNumber);
 ```
 
 Installation and usage
