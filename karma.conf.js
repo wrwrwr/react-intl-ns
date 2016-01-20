@@ -7,7 +7,7 @@ const process = require('process');
 // point to its physical location.
 let projectDir = process.cwd();
 
-// Reuse the webpack configuration for tests, but bundle everything.
+// Reuse the Webpack configuration for tests, but bundle everything.
 let webpack = require(path.join(projectDir, 'webpack.config.js'));
 if (!Array.isArray(webpack)) {
     webpack = [webpack];
