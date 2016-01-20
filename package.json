@@ -5,7 +5,7 @@
     "author": "Wojtek Ruszczewski <react-intl-ns@wr.waw.pl>",
     "keywords": ["react", "react-intl"],
     "scripts": {
-        "build": "webpack -p --es=5",
+        "build": "webpack -p",
         "test": "karma start && eslint . --ext=js --ext=jsx",
         "prepublish": "npm run build && npm test"
     },

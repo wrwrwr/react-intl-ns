@@ -7,8 +7,13 @@ var projectDir = process.cwd();
 
 // Reuse the webpack configuration for tests, but bundle everything.
 var webpack = require(path.join(projectDir, 'webpack.config.js'));
-webpack.entry = {};
-webpack.externals = {};
+if (!Array.isArray(webpack)) {
+    webpack = [webpack];
+}
+for (var config of webpack) {
+    config.entry = {};
+    config.externals = {};
+}
 
 
 module.exports = function(config) {
