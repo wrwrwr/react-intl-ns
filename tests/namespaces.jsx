@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {FormattedMessage, IntlProvider} from 'react-intl';
+import {FormattedMessage, IntlProvider,
+        injectIntl, intlShape} from 'react-intl';
 
 import {IntlNamespace, IntlNsProvider, intlShortcuts} from '../main';
 
@@ -130,19 +131,32 @@ describe("Namespaces", () => {
         ).should.equal('<span>26%</span>');
     });
 
-    it("intlRef can be used to access intl (valid on string cast)", () => {
+    it("intl holds valid namespaces when attributes are stringified", () => {
         const messages = {en: {title: "ns title"}};
-        let nsIntl;
+
         class DelayedIntlUse {
+            constructor(intl) {
+                this.intl = intl;
+            }
+
             toString() {
-                return nsIntl.formatMessage({id: 'ns::title'});
+                return this.intl.formatMessage({id: 'ns::title'});
             }
         }
+
+        @injectIntl
+        class Comp extends Component {
+            static propTypes = {intl: intlShape.isRequired};
+            render() {
+                let {intl} = this.props;
+                return <span data-title={new DelayedIntlUse(intl)} />;
+            }
+        }
+
         renderToStaticMarkup(
                 <IntlNsProvider locale='en'>
-                    <IntlNamespace namespace='ns' messages={messages}
-                                   intlRef={intl => nsIntl = intl}>
-                        <span data-title={new DelayedIntlUse()} />
+                    <IntlNamespace namespace='ns' messages={messages}>
+                        <Comp />
                     </IntlNamespace>
                 </IntlNsProvider>
         ).should.equal('<span data-title="ns title"></span>');

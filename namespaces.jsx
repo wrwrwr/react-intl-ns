@@ -80,7 +80,6 @@ export class IntlNamespace extends Component {
         namespace: PropTypes.string.isRequired,
         messages: PropTypes.object,
         formats: PropTypes.object,
-        intlRef: PropTypes.func,
         children: PropTypes.element.isRequired
     };
 
@@ -93,13 +92,10 @@ export class IntlNamespace extends Component {
     };
 
     getChildContext() {
-        let {namespace, intlRef, children, ...other} = this.props;
+        let {namespace, children, ...other} = this.props;
         let {intl} = this.context;
         if (intl.namespaces !== undefined) {
             intl.namespaces[namespace] = other;
-        }
-        if (intlRef) {
-            intlRef(intl);
         }
         return this.context;
     }

@@ -216,7 +216,7 @@ module.exports = {
         'react/jsx-indent': 0,  // 8 spaces, similarly to continuation lines.
         'react/jsx-key': 1,
         'react/jsx-max-props-per-line': 0,
-        'react/jsx-no-bind': [1, {ignoreRefs: true}],  // Except intlRef.
+        'react/jsx-no-bind': [2, {ignoreRefs: true}],
         'react/jsx-no-duplicate-props': 2,
         'react/jsx-no-literals': 1,
         'react/jsx-no-undef': 2,

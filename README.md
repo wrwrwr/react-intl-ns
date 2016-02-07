@@ -111,16 +111,19 @@ element cannot be used, consider a `ts`, `hs` or `ns` shortcut:
 
 ```js
 import React, {Component} from 'react';
+import {injectlIntl, intlShape} from 'react-intl';
 import {IntlNamespace, intlShortcuts} from 'react-intl-ns';
 
 const {ts} = intlShortcuts('forms');
 const messages = {en: {placeholder: "Write a poem?"}};
 
+@injectIntl
 export class Textarea extends Component {
+    static propTypes = {intl: intlShape.isRequired};
+
     render() {
-        return  <IntlNamespace namespace='forms' messages={messages}
-                               intlRef={intl => this.intl = intl}>
-                    <textarea placeholder={ts`placeholder`(this)} />
+        return  <IntlNamespace namespace='forms' messages={messages}>
+                    <textarea placeholder={ts`placeholder`(this.props.intl)} />
                 </IntlNamespace>;
     }
 }
@@ -128,16 +131,10 @@ export class Textarea extends Component {
 
 These shortcuts can be used similarly to their non-string counterparts (as
 template tags or functions with values), but generate string promises instead
-of elements. That's why they need to be manually given access to the `intl`
-object.
+of elements. That's why they need to be manually given the `intl` object.
 
-Moreover, the shortcut code is executed before the `intlRef` function, thus the
-shortcut is passed a "future intl holder" (here `this`) and postpones looking
-for an `intl` property on the holder until it's actually needed.
-
-The "intl holder" can be any object that will have an `intl` property at the
-right time. Passing `context` (after adding `intl` to `contextTypes`) or `props`
-(after decorating the component with `@injectIntl`) also works.
+If you do not mind using the experimental `context` you may avoid the decorator
+by adding `intl` to `contextTypes`.
 
 Shortcut factories
 ------------------

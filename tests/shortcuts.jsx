@@ -90,15 +90,23 @@ describe("Element shortcuts", () => {
 
 
 describe("String shortcuts", () => {
-    it("ts() inserts a string (given an intl holder)", () => {
+    it("ts() inserts a string (given a valid intl)", () => {
         const {ts} = intlShortcuts('forms');
         const messages = {en: {id: "msg"}};
-        let intlHolder = {};
+
+        @injectIntl
+        class Comp extends Component {
+            static propTypes = {intl: intlShape.isRequired};
+            render() {
+                let {intl} = this.props;
+                return <textarea placeholder={ts`id`(intl)} />;
+            }
+        }
+
         renderToStaticMarkup(
                 <IntlNsProvider locale='en'>
-                        <IntlNamespace namespace='forms' messages={messages}
-                                       intlRef={intl => intlHolder.intl = intl}>
-                            <textarea placeholder={ts`id`(intlHolder)} />
+                        <IntlNamespace namespace='forms' messages={messages}>
+                            <Comp />
                         </IntlNamespace>
                 </IntlNsProvider>
         ).should.equal('<textarea placeholder="msg"></textarea>');
@@ -107,53 +115,45 @@ describe("String shortcuts", () => {
     it("hs() inserts an escaped string", () => {
         const {hs} = intlShortcuts('forms');
         const messages = {en: {id: "<b>msg</b>"}};
-        let intlHolder = {};
-        renderToStaticMarkup(
-                <IntlNsProvider locale='en'>
-                        <IntlNamespace namespace='forms' messages={messages}
-                                       intlRef={intl => intlHolder.intl = intl}>
-                            <span data-html={hs`id`(intlHolder)} />
-                        </IntlNamespace>
-                </IntlNsProvider>
-        ).should.equal('<span data-html="&lt;b&gt;msg&lt;/b&gt;"></span>');
-    });
-
-    it("ns() inserts a number cast to a string", () => {
-        const {ns} = intlShortcuts('forms');
-        const formats = {number: {format: {style: 'percent'}}};
-        let intlHolder = {};
-        renderToStaticMarkup(
-                <IntlNsProvider locale='en'>
-                        <IntlNamespace namespace='forms' formats={formats}
-                                       intlRef={intl => intlHolder.intl = intl}>
-                            <span data-number={ns('format', .26)(intlHolder)} />
-                        </IntlNamespace>
-                </IntlNsProvider>
-        ).should.equal('<span data-number="26%"></span>');
-    });
-
-    it("string shortcuts can be used with @injectIntl", () => {
-        const {ts} = intlShortcuts('forms');
-        const messages = {en: {id: "msg"}};
 
         @injectIntl
-        class Textarea extends Component {
-            static propTypes = {
-                intl: intlShape.isRequired
-            };
-
+        class Comp extends Component {
+            static propTypes = {intl: intlShape.isRequired};
             render() {
-                return  <IntlNamespace namespace='forms' messages={messages}>
-                            <textarea placeholder={ts`id`(this.props)} />
-                        </IntlNamespace>;
+                let {intl} = this.props;
+                return <span data-html={hs`id`(intl)} />;
             }
         }
 
         renderToStaticMarkup(
                 <IntlNsProvider locale='en'>
-                    <Textarea />
+                        <IntlNamespace namespace='forms' messages={messages}>
+                            <Comp />
+                        </IntlNamespace>
                 </IntlNsProvider>
-        ).should.equal('<textarea placeholder="msg"></textarea>');
+        ).should.equal('<span data-html="&lt;b&gt;msg&lt;/b&gt;"></span>');
+    });
+
+    it("ns() inserts a properly formatted number", () => {
+        const {ns} = intlShortcuts('forms');
+        const formats = {number: {format: {style: 'percent'}}};
+
+        @injectIntl
+        class Comp extends Component {
+            static propTypes = {intl: intlShape.isRequired};
+            render() {
+                let {intl} = this.props;
+                return <span data-number={ns('format', .26)(intl)} />;
+            }
+        }
+
+        renderToStaticMarkup(
+                <IntlNsProvider locale='en'>
+                        <IntlNamespace namespace='forms' formats={formats}>
+                            <Comp />
+                        </IntlNamespace>
+                </IntlNsProvider>
+        ).should.equal('<span data-number="26%"></span>');
     });
 });
 
@@ -210,11 +210,11 @@ describe("Shortcut factories", () => {
     it("shortcuts for formatMessage-like methods can be created", () => {
         let factory = intlMessageStringShortcut('func');
         let shortcut = factory('ns');
-        let intlHolder = {intl: {func: () => "msg"}};
-        let funcSpy = sinon.spy(intlHolder.intl, 'func');
-        shortcut`id`(intlHolder).toString().should.equal('msg');
+        let intl = {func: () => "msg"};
+        let funcSpy = sinon.spy(intl, 'func');
+        shortcut`id`(intl).toString().should.equal('msg');
         funcSpy.should.have.been.calledWithMatch({id: 'ns::id'});
-        shortcut('id', {v: 4})(intlHolder).toString().should.equal('msg');
+        shortcut('id', {v: 4})(intl).toString().should.equal('msg');
         funcSpy.should.have.been.calledWithMatch({id: 'ns::id'}, {v: 4});
         funcSpy.should.have.been.calledTwice();
     });
@@ -222,11 +222,11 @@ describe("Shortcut factories", () => {
     it("shortcuts for formatNumber-like methods can be created", () => {
         let factory = intlNumberStringShortcut('func');
         let shortcut = factory('ns');
-        let intlHolder = {intl: {func: () => "5"}};
-        let funcSpy = sinon.spy(intlHolder.intl, 'func');
-        shortcut(3)(intlHolder).toString().should.equal('5');
+        let intl = {func: () => "5"};
+        let funcSpy = sinon.spy(intl, 'func');
+        shortcut(3)(intl).toString().should.equal('5');
         funcSpy.should.have.been.calledWith(3);
-        shortcut('f', 3)(intlHolder).toString().should.equal('5');
+        shortcut('f', 3)(intl).toString().should.equal('5');
         funcSpy.should.have.been.calledWith(3, {format: 'ns::f'});
         funcSpy.should.have.been.calledTwice();
     });

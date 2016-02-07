@@ -66,30 +66,28 @@ export function intlNumberShortcut(component) {
 
 
 /**
- * Delays execution of func(obj.intl) until a cast to a string is made.
+ * Delays execution of func(intl) until a cast to a string is made.
  */
 class StringPromise {
-    constructor(intlHolder, func) {
-        this.intlHolder = intlHolder;
+    constructor(intl, func) {
+        this.intl = intl;
         this.func = func;
     }
 
     toString() {
-        return this.func(this.intlHolder.intl);
+        return this.func(this.intl);
     }
 }
 
 
 /**
- * Creates a direct string formatter shortcut, to be used with IntlNamespace
- * intlRef or react-intl's own @injectIntl.
+ * Creates a direct string formatter shortcut, to be used with @injectIntl.
  *
  * The factory is created for a given (name of) a format* method. It can then
  * generate a shortcuts bound to a namespace. Such a shortcut can be used as a
  * function or a template tag, similarly to the non-string version, but instead
  * of returning a React element it gives a function taking as the only argument
- * some object (context, props) that is required to hold the intl object as a
- * property when it's needed (at the time the promise is cast to a string).
+ * the intl object and returning a plain string.
  */
 export function intlMessageStringShortcut(method) {
     return namespace => {
@@ -97,9 +95,9 @@ export function intlMessageStringShortcut(method) {
         return (...args) => {
             let {id, values} = maybeEvaluateTemplate(args);
             let descriptor = {id: prefix(id), defaultMessage: id};
-            return intlHolder => new StringPromise(
-                    intlHolder,
-                    intl => intl[method](descriptor, values)
+            return intl => new StringPromise(
+                    intl,
+                    validIntl => validIntl[method](descriptor, values)
             );
         };
     };
@@ -114,15 +112,15 @@ export function intlNumberStringShortcut(method) {
         let prefix = prefixer(namespace);
         return (format, value) => {
             if (value === undefined) {
-                return intlHolder => new StringPromise(
-                        intlHolder,
-                        intl => intl[method](format)
+                return intl => new StringPromise(
+                        intl,
+                        validIntl => validIntl[method](format)
                 );
             } else {
                 format = prefix(format);
-                return intlHolder => new StringPromise(
-                        intlHolder,
-                        intl => intl[method](value, {format})
+                return intl => new StringPromise(
+                        intl,
+                        validIntl => validIntl[method](value, {format})
                 );
             }
         };
