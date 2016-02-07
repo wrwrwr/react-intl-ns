@@ -1,20 +1,23 @@
 module.exports = {
-    'root': true,
-    'parser': 'babel-eslint',
-    'env': {
-        'es6': true,
-        'node': true
+    root: true,
+    parser: 'babel-eslint',
+    env: {
+        browser: true,
+        es6: true,
+        node: true
     },
-    'ecmaFeatures': {
-        'experimentalObjectRestSpread': true,
-        'jsx': true,
-        'modules': true
+    ecmaFeatures: {
+        experimentalObjectRestSpread: true,
+        jsx: true,
+        modules: true
     },
-    'plugins': [
-        'react'
+    plugins: [
+        'rapid7',
+        'react',
+        'sort-class-members'
     ],
-    'extends': 'eslint:recommended',  // In case some new options are added.
-    'rules': {
+    extends: 'eslint:recommended',  // In case some new options are added.
+    rules: {
         // ESLint's docs "Possible errors" section (most in recommended).
         'no-console': 1,
         'no-extra-parens': 1,
@@ -52,8 +55,13 @@ module.exports = {
         'no-labels': 1,
         'no-lone-blocks': 1,
         'no-loop-func': 2,
-        'no-magic-numbers': 1,
-        'no-multi-spaces': 1,
+        // 'no-magic-numbers': 1,  // Replaced by the below rule for statics.
+        'rapid7/static-magic-numbers': [1, {ignore: [0, 1, 2, 100]}],
+        'rapid7/static-screaming-snake': 0,
+        // Double space after a return followed by multiline JSX seems better
+        // than parentheses and an additional line.
+        'no-multi-spaces': [1, {exceptions: {Property: false,
+                                             ReturnStatement: true}}],
         'no-multi-str': 2,
         'no-native-reassign': 2,
         'no-new-func': 2,
@@ -70,11 +78,13 @@ module.exports = {
         'no-self-compare': 2,
         'no-sequences': 2,
         'no-throw-literal': 2,
-        'no-unused-expressions': 2,
+        // Triggering a browser reflow using offsetHeight is acceptable
+        // (until there's a cleaner solution).
+        'no-unused-expressions': 1,
         'no-useless-call': 2,
         'no-useless-concat': 2,
         'no-void': 2,
-        'no-warning-comments': [1, {'location': 'anywhere'}],
+        'no-warning-comments': [1, {location: 'anywhere'}],
         'no-with': 1,
         'radix': 0,
         'vars-on-top': 2,
@@ -153,12 +163,13 @@ module.exports = {
         'no-underscore-dangle': 2,
         'no-unneeded-ternary': 1,
         'object-curly-spacing': 2,
-        'one-var': [1, {'uninitialized': 'always', 'initialized': 'never'}],
+        'one-var': [1, {uninitialized: 'always', initialized: 'never'}],
         'operator-assignment': 2,
         'operator-linebreak': 2,
         'padded-blocks': [2, 'never'],
-        'quote-props': [2, 'consistent-as-needed'],
-        'quotes': [2, 'single'],
+        // Exceptions are acceptable for cross-object consistency.
+        'quote-props': [1, 'consistent-as-needed'],
+        'quotes': [1, 'single'],  // Double for human-readable strings.
         'require-jsdoc': 1,
         'semi-spacing': 2,
         'semi': [2, 'always'],
@@ -200,12 +211,12 @@ module.exports = {
         'react/jsx-boolean-value': 1,
         'react/jsx-closing-bracket-location': 0,
         'react/jsx-curly-spacing': [2, 'never'],
-        'react/jsx-handler-names': 1,
+        'react/jsx-handler-names': 0,
         'react/jsx-indent-props': 0,
-        'react/jsx-indent': 2,
+        'react/jsx-indent': 0,  // 8 spaces, similarly to continuation lines.
         'react/jsx-key': 1,
         'react/jsx-max-props-per-line': 0,
-        'react/jsx-no-bind': 2,
+        'react/jsx-no-bind': [1, {ignoreRefs: true}],  // Except intlRef.
         'react/jsx-no-duplicate-props': 2,
         'react/jsx-no-literals': 1,
         'react/jsx-no-undef': 2,
@@ -219,19 +230,21 @@ module.exports = {
         'react/no-deprecated': 1,
         'react/no-did-mount-set-state': 2,
         'react/no-did-update-set-state': 2,
-        'react/no-direct-mutation-state': 2,
+        'react/no-direct-mutation-state': 1,  // Acceptable in constructor.
         'react/no-is-mounted': 2,
         'react/no-multi-comp': 0,
         'react/no-set-state': 0,
         'react/no-string-refs': 1,
         'react/no-unknown-property': 2,
         'react/prefer-es6-class': 2,
-        'react/prop-types': 2,
+        'react/prop-types': [1, {ignore: ['className']}],
         'react/react-in-jsx-scope': 2,
         'react/require-extension': [2, {extensions: ['.js', '.jsx']}],
         'react/self-closing-comp': 2,
-        'react/sort-comp': [2, {order: ['lifecycle', 'render',
-                                        'everything-else']}],
+        // Order: Statics, field initializers, constructor, lifecycle as in
+        //        React docs, render, all other in call / usage order.
+        // 'react/sort-comp': 2,
+        'sort-class-members/sort-class-members': 2,
         'react/wrap-multilines': 0
     }
 };
