@@ -5,6 +5,7 @@ const path = require('path');
 const process = require('process');
 const string = require('string-replace-webpack-plugin');
 const webpack = require('webpack');
+const sassJson = require('node-sass-json-importer');
 
 // This configuration may be symlinked from a project, thus __dirname may
 // point to its physical location.
@@ -49,7 +50,7 @@ babelDirs.push(projectDir);
 // What should Babel transpile to? (Just ES5 is supported at the moment :-)
 let babelPresets = esEditions.map(edition => {
     switch (edition) {
-        // WA: https://github.com/webpack/webpack/issues/1883.
+        // TODO: Currently enabling the tree-shaking gives larger builds.
         case 5: return ['es2015' /*-webpack2*/, 'stage-0', 'react'];
         case 6: return ['stage-0', 'react'];
         case 7: return ['react'];
@@ -67,7 +68,7 @@ module.exports = esEditions.map((edition, index) => ({
     output: outputs[index],
     externals: externals,
     resolve: {
-        extensions: ['', '.js', '.jsx'],
+        extensions: ['', '.js', '.jsx', '.json5'],
         modules: ['node_modules', globalModules]
     },
     resolveLoader: {
@@ -79,7 +80,14 @@ module.exports = esEditions.map((edition, index) => ({
                 test: /\.jsx?$/,
                 include: RegExp(babelDirs.join('|')),
                 loader: 'babel',
-                query: {presets: babelPresets[index]}
+                query: {
+                    plugins: ['transform-decorators-legacy'],
+                    presets: babelPresets[index]
+                }
+            },
+            {
+                test: /\.json5$/,
+                loader: 'json5'
             },
             {
                 test: /\.scss$/,
@@ -95,5 +103,8 @@ module.exports = esEditions.map((edition, index) => ({
     },
     plugins: [
         new string()
-    ]
+    ],
+    sassLoader: {
+        importer: sassJson
+    }
 }));
