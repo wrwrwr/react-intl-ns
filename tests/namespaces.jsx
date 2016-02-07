@@ -118,7 +118,7 @@ describe("Namespaces", () => {
 
     it("uses namespace formats, within a message", () => {
         const {t} = intlShortcuts('namespace');
-        const messages = {en: {title: '{value, number, format}'}};
+        const messages = {en: {title: "{value, number, format}"}};
         const formats = {number: {format: {style: 'percent'}}};
         renderToStaticMarkup(
                 <IntlNsProvider locale='en'>
@@ -130,8 +130,26 @@ describe("Namespaces", () => {
         ).should.equal('<span>26%</span>');
     });
 
+    it("intlRef can be used to access intl (valid on string cast)", () => {
+        const messages = {en: {title: "ns title"}};
+        let nsIntl;
+        class DelayedIntlUse {
+            toString() {
+                return nsIntl.formatMessage({id: 'ns::title'});
+            }
+        }
+        renderToStaticMarkup(
+                <IntlNsProvider locale='en'>
+                    <IntlNamespace namespace='ns' messages={messages}
+                                   intlRef={intl => nsIntl = intl}>
+                        <span data-title={new DelayedIntlUse()} />
+                    </IntlNamespace>
+                </IntlNsProvider>
+        ).should.equal('<span data-title="ns title"></span>');
+    });
+
     it("the provider can be used with standard intl components", () => {
-        const messages = {title: 'intl title'};
+        const messages = {title: "intl title"};
         renderToStaticMarkup(
                 <IntlNsProvider locale='en' messages={messages}>
                     <FormattedMessage id='title' />
@@ -140,7 +158,7 @@ describe("Namespaces", () => {
     });
 
     it("namespaces do not interfere with the standard provider", () => {
-        const appMessages = {'namespace::title': 'app title'};
+        const appMessages = {'namespace::title': "app title"};
         const nsMessages = {en: {title: 'ns title'}};
         renderToStaticMarkup(
                 <IntlProvider locale='en' messages={appMessages}>
@@ -153,7 +171,7 @@ describe("Namespaces", () => {
 
     it("shortcuts can be used without the provider or a namespace", () => {
         const {t} = intlShortcuts('namespace');
-        const messages = {'namespace::title': 'ns title'};
+        const messages = {'namespace::title': "ns title"};
         renderToStaticMarkup(
                 <IntlProvider locale='en' messages={messages}>
                     {t`title`}

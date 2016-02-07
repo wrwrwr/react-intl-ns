@@ -6,16 +6,20 @@ import {separator} from './main';
 
 
 /**
- * Returns shortcuts producing Formatted* elements bound to a namespace.
+ * Returns shortcuts bound to a namespace, either producing Formatted* elements
+ * or string promises.
  *
  * May also be called without a namespace, returning simple abbreviations for
- * Formatted* elements.
+ * Formatted* elements and format* methods.
  */
 export function intlShortcuts(namespace) {
     return {
         t: intlMessageShortcut(FormattedMessage)(namespace),
+        ts: intlMessageStringShortcut('formatMessage')(namespace),
         h: intlMessageShortcut(FormattedHTMLMessage)(namespace),
-        n: intlNumberShortcut(FormattedNumber)(namespace)
+        hs: intlMessageStringShortcut('formatHTMLMessage')(namespace),
+        n: intlNumberShortcut(FormattedNumber)(namespace),
+        ns: intlNumberStringShortcut('formatNumber')(namespace)
     };
 }
 
@@ -55,6 +59,71 @@ export function intlNumberShortcut(component) {
             } else {
                 return createElement(component, {format: prefix(format),
                                                  value});
+            }
+        };
+    };
+}
+
+
+/**
+ * Delays execution of func(obj.intl) until a cast to a string is made.
+ */
+class StringPromise {
+    constructor(intlHolder, func) {
+        this.intlHolder = intlHolder;
+        this.func = func;
+    }
+
+    toString() {
+        return this.func(this.intlHolder.intl);
+    }
+}
+
+
+/**
+ * Creates a direct string formatter shortcut, to be used with IntlNamespace
+ * intlRef or react-intl's own @injectIntl.
+ *
+ * The factory is created for a given (name of) a format* method. It can then
+ * generate a shortcuts bound to a namespace. Such a shortcut can be used as a
+ * function or a template tag, similarly to the non-string version, but instead
+ * of returning a React element it gives a function taking as the only argument
+ * some object (context, props) that is required to hold the intl object as a
+ * property when it's needed (at the time the promise is cast to a string).
+ */
+export function intlMessageStringShortcut(method) {
+    return namespace => {
+        let prefix = prefixer(namespace);
+        return (...args) => {
+            let {id, values} = maybeEvaluateTemplate(args);
+            let descriptor = {id: prefix(id), defaultMessage: id};
+            return intlHolder => new StringPromise(
+                    intlHolder,
+                    intl => intl[method](descriptor, values)
+            );
+        };
+    };
+}
+
+
+/**
+ * Creates a direct number formatter shortcut.
+ */
+export function intlNumberStringShortcut(method) {
+    return namespace => {
+        let prefix = prefixer(namespace);
+        return (format, value) => {
+            if (value === undefined) {
+                return intlHolder => new StringPromise(
+                        intlHolder,
+                        intl => intl[method](format)
+                );
+            } else {
+                format = prefix(format);
+                return intlHolder => new StringPromise(
+                        intlHolder,
+                        intl => intl[method](value, {format})
+                );
             }
         };
     };

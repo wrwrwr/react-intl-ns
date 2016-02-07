@@ -1,6 +1,7 @@
 import {Children, Component, PropTypes} from 'react';
 import {IntlProvider, intlShape} from 'react-intl';
-import {formatMessage, formatNumber} from 'react-intl/lib/format';
+import {formatHTMLMessage, formatMessage,
+        formatNumber} from 'react-intl/lib/format';
 
 import {separator} from './main';
 
@@ -39,6 +40,19 @@ export class IntlNsProvider extends IntlProvider {
             });
             return formatMessage(nsConfig, state, {id, ...other}, values);
         };
+        intl.formatHTMLMessage = (...args) => {
+            let [{id: prefixedId, ...other}, values] = args;
+            let [prefix, id] = prefixedId.split(separator);
+            let namespace = namespaces[prefix];
+            if (id === undefined || !namespace) {
+                return formatHTMLMessage(config, state, ...args);
+            }
+            let nsConfig = Object.assign({}, config, {
+                messages: namespace.messages[intl.locale],
+                formats: namespace.formats
+            });
+            return formatHTMLMessage(nsConfig, state, {id, ...other}, values);
+        };
         intl.formatNumber = (...args) => {
             let [value, {format: prefixedFormat, ...other}] = args;
             let [prefix, format] = prefixedFormat.split(separator);
@@ -66,6 +80,7 @@ export class IntlNamespace extends Component {
         namespace: PropTypes.string.isRequired,
         messages: PropTypes.object,
         formats: PropTypes.object,
+        intlRef: PropTypes.func,
         children: PropTypes.element.isRequired
     };
 
@@ -78,10 +93,13 @@ export class IntlNamespace extends Component {
     };
 
     getChildContext() {
-        let {namespace, children, ...other} = this.props;
+        let {namespace, intlRef, children, ...other} = this.props;
         let {intl} = this.context;
         if (intl.namespaces !== undefined) {
             intl.namespaces[namespace] = other;
+        }
+        if (intlRef) {
+            intlRef(intl);
         }
         return this.context;
     }
