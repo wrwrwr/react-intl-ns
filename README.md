@@ -169,7 +169,7 @@ Installation and usage
 ----------------------
 
 ```bash
-npm install react react-intl@2.0.0-beta-2 react-intl-ns
+npm install react react-intl react-intl-ns
 ```
 
 ### Bundler and transpiler

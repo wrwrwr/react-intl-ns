@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {FormattedMessage, IntlProvider,
-        injectIntl, intlShape} from 'react-intl';
+        addLocaleData, injectIntl, intlShape} from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import es from 'react-intl/locale-data/es';
 
 import {IntlNamespace, IntlNsProvider, intlShortcuts} from '../main';
+
+addLocaleData([...en, ...es]);
 
 
 describe("Namespaces", () => {
@@ -88,10 +92,10 @@ describe("Namespaces", () => {
 
     it("limits messages from a namespace to its scope", () => {
         const {t} = intlShortcuts('namespace');
-        const messages = {en: {title: "ns title"}};
+        const messages = {es: {title: "ns title"}};
         sinon.stub(console, 'error');
         renderToStaticMarkup(
-                <IntlNsProvider locale='en'>
+                <IntlNsProvider locale='es'>
                     <div>
                         {t`title`}
                         <IntlNamespace namespace='namespace'

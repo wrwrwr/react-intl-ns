@@ -1,7 +1,7 @@
 import {Children, Component, PropTypes} from 'react';
 import {IntlProvider, intlShape} from 'react-intl';
-import {formatHTMLMessage, formatMessage,
-        formatNumber} from 'react-intl/lib/format';
+import {formatHTMLMessage, formatMessage, formatNumber}
+                                                from 'react-intl/src/format';
 
 import {separator} from './main';
 

@@ -14,8 +14,8 @@
     "main:es6": "dist/main.es6.js",
     "main:es7:jsx": "main.jsx",
     "peerDependencies": {
-        "react": "^0.14.7",
-        "react-intl": "^2.0.0-beta-2"
+        "react": "^15.0.1",
+        "react-intl": "^2.0.1"
     },
     "webpack": {
         "library": "ReactIntlNs",
@@ -33,6 +33,10 @@
                 "root": "ReactIntl"
             }
         },
+        "babel": {
+            "dirs": [
+                "react-intl/src"
+            ]
         }
     },
     "repository": {
