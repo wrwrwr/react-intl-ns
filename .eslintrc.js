@@ -20,6 +20,7 @@ module.exports = {
     rules: {
         // ESLint's docs "Possible errors" section (most in recommended).
         'no-console': 1,
+        'no-constant-condition': 2,
         'no-extra-parens': 1,
         'no-unexpected-multiline': 2,
         'valid-jsdoc': 0,
@@ -31,7 +32,7 @@ module.exports = {
         'consistent-return': 2,
         'curly': 2,
         'default-case': 0,
-        'dot-location': 1,
+        'dot-location': [1, 'property'],
         'dot-notation': 2,
         'eqeqeq': 2,
         'guard-for-in': 1,
@@ -40,7 +41,6 @@ module.exports = {
         'no-case-declarations': 1,
         'no-div-regex': 1,
         'no-else-return': 0,
-        'no-empty-label': 2,
         'no-empty-pattern': 0,
         'no-eq-null': 2,
         'no-eval': 2,
@@ -56,7 +56,7 @@ module.exports = {
         'no-lone-blocks': 1,
         'no-loop-func': 2,
         // 'no-magic-numbers': 1,  // Replaced by the below rule for statics.
-        'rapid7/static-magic-numbers': [1, {ignore: [0, 1, 2, 100]}],
+        'rapid7/static-magic-numbers': [1, {ignore: [-1, 0, 1, 2, 10, 100]}],
         'rapid7/static-screaming-snake': 0,
         // Double space after a return followed by multiline JSX seems better
         // than parentheses and an additional line.
@@ -88,7 +88,7 @@ module.exports = {
         'no-with': 1,
         'radix': 0,
         'vars-on-top': 2,
-        'wrap-iife': 2,
+        'wrap-iife': [2, 'inside'],
         'yoda': 1,
 
         // Proper strict statements can be added during a build step.
@@ -104,7 +104,7 @@ module.exports = {
         'no-undef-init': 2,
         'no-undef': 2,
         'no-undefined': 0,
-        'no-unused-vars': 2,
+        'no-unused-vars': [2, {varsIgnorePattern: '_'}],
         'no-use-before-define': 0,
 
         // Node section.
@@ -129,12 +129,13 @@ module.exports = {
         'consistent-this': 2,
         'eol-last': 2,
         'func-names': 2,
-        'func-style': 2,
+        'func-style': 0,
         'id-length': 0,
         'id-match': 1,
-        'indent': [2, 4],
+        'indent': [2, 4, {SwitchCase: 1}],
         'jsx-quotes': [2, 'prefer-single'],
         'key-spacing': 2,
+        'keyword-spacing': 2,
         'linebreak-style': [2, 'unix'],
         'lines-around-comment': 2,
         'max-depth': 1,
@@ -174,16 +175,13 @@ module.exports = {
         'semi-spacing': 2,
         'semi': [2, 'always'],
         'sort-vars': 0,
-        'space-after-keywords': 2,
         'space-before-blocks': 2,
         'space-before-function-paren': [2, 'never'],
-        'space-before-keywords': 2,
         'space-in-parens': 2,
         'space-infix-ops': 2,
-        'space-return-throw-case': 2,
         'space-unary-ops': 2,
         'spaced-comment': 2,
-        'wrap-regex': 2,
+        'wrap-regex': 1,
 
         // ES6 section.
         'arrow-body-style': 2,
@@ -191,8 +189,8 @@ module.exports = {
         'arrow-spacing': 2,
         'constructor-super': 2,
         'generator-star-spacing': 2,
-        'no-arrow-condition': 2,
         'no-class-assign': 2,
+        'no-confusing-arrow': 2,
         'no-const-assign': 2,
         'no-dupe-class-members': 2,
         'no-this-before-super': 2,
@@ -211,6 +209,7 @@ module.exports = {
         'react/jsx-boolean-value': 1,
         'react/jsx-closing-bracket-location': 0,
         'react/jsx-curly-spacing': [2, 'never'],
+        'react/jsx-first-prop-new-line': 1,
         'react/jsx-handler-names': 0,
         'react/jsx-indent-props': 0,
         'react/jsx-indent': 0,  // 8 spaces, similarly to continuation lines.
@@ -237,9 +236,11 @@ module.exports = {
         'react/no-string-refs': 1,
         'react/no-unknown-property': 2,
         'react/prefer-es6-class': 2,
+        'react/prefer-stateless-function': 1,
         'react/prop-types': [1, {ignore: ['className']}],
         'react/react-in-jsx-scope': 2,
         'react/require-extension': [2, {extensions: ['.js', '.jsx']}],
+        'react/require-render-return': 2,
         'react/self-closing-comp': 2,
         // Order: Statics, field initializers, constructor, lifecycle as in
         //        React docs, render, all other in call / usage order.

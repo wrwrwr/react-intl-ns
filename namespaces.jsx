@@ -92,7 +92,7 @@ export class IntlNamespace extends Component {
     };
 
     getChildContext() {
-        let {namespace, children, ...other} = this.props;
+        let {namespace, children: _, ...other} = this.props;
         let {intl} = this.context;
         if (intl.namespaces !== undefined) {
             intl.namespaces[namespace] = other;

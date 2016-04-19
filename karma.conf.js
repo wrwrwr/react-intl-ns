@@ -9,12 +9,16 @@ let projectDir = process.cwd();
 
 // Reuse the Webpack configuration for tests, but bundle everything.
 let webpack = require(path.join(projectDir, 'webpack.config.js'));
+if (typeof webpack === 'function') {
+    webpack = webpack('t');
+}
 if (!Array.isArray(webpack)) {
     webpack = [webpack];
 }
 for (let config of webpack) {
+    config.target = 'web';
     config.entry = {};
-    config.externals = {};
+    config.externals = {'fs': '', 'yargs': ''};
 }
 
 
@@ -33,7 +37,7 @@ module.exports = config => {
             'tests/*.jsx': ['webpack']
         },
         browsers: [
-//            'PhantomJS2',
+//            'PhantomJS',
             'Firefox',
 //            'Chrome'
         ],
@@ -43,7 +47,7 @@ module.exports = config => {
             'karma-mocha',
             'karma-sinon-chai',
             'karma-webpack',
-//            'karma-phantomjs2-launcher',
+//            'karma-phantomjs-launcher',
             'karma-firefox-launcher',
 //            'karma-chrome-launcher'
         ],

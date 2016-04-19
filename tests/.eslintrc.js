@@ -24,6 +24,8 @@ module.exports = {
         // Double quotes for human-readable strings.
         'quotes': [0, 'single'],
         // Usually there is just a single component created in a case.
-        'react/display-name': 0
+        'react/display-name': 0,
+        // Tests are written more for readiblity than performance.
+        'react/prefer-stateless-function': 0
     }
 };
